@@ -63,22 +63,36 @@ train_pipeline = [
                    'custom_entities', 'tokens_positive', 'dataset_mode'))
 ]
 
+# train_dataloader = dict(
+#     batch_size=16,
+#     dataset=dict(
+#         _delete_=True,
+#         type='ClassBalancedDataset',
+#         oversample_thr=1e-3,
+#         dataset=dict(
+#             type='ODVGDataset',
+#             data_root=data_root,
+#             need_text=False,
+#             label_map_file='COCO/doclaynet_label_map.json',
+#             ann_file='COCO/train_mmdet.json',
+#             data_prefix=dict(img='PNG/'), 
+#             filter_cfg=dict(filter_empty_gt=False, min_size=32),
+#             return_classes=True,
+#             pipeline=train_pipeline)))
+
 train_dataloader = dict(
-    batch_size=16,
+    batch_size=4,
     dataset=dict(
         _delete_=True,
-        type='ClassBalancedDataset',
-        oversample_thr=1e-3,
-        dataset=dict(
-            type='ODVGDataset',
-            data_root=data_root,
-            need_text=False,
-            label_map_file='COCO/doclaynet_label_map.json',
-            ann_file='COCO/train_mmdet.json',
-            data_prefix=dict(img='PNG/'), 
-            filter_cfg=dict(filter_empty_gt=False, min_size=32),
-            return_classes=True,
-            pipeline=train_pipeline)))
+        type='ODVGDataset',
+        data_root=data_root,
+        need_text=False,
+        label_map_file='COCO/doclaynet_label_map.json',
+        ann_file='COCO/train_mmdet.json',
+        data_prefix=dict(img='PNG/'), 
+        filter_cfg=dict(filter_empty_gt=False, min_size=32),
+        return_classes=True,
+        pipeline=train_pipeline))
 
 
 # val_dataloader = dict(
@@ -92,7 +106,7 @@ val_dataloader = dict(
     dataset=dict(
         data_root=data_root,
         return_classes=True,
-        type='CocoDataset',
+        # type='CocoDataset',
         # type='DocLayNetDataset',
         metainfo=metainfo,
         ann_file='COCO/val.json', 
@@ -132,10 +146,16 @@ param_scheduler = [
 ]
 train_cfg = dict(max_epochs=max_epochs, val_interval=3)
 
+
+vis_backends = [
+    dict(type='LocalVisBackend'),
+    dict(type='TensorboardVisBackend'),
+    ]
+
 default_hooks = dict(
     checkpoint=dict(
         max_keep_ckpts=2, save_best='auto'))
 
 # load_from = 'https://download.openmmlab.com/mmdetection/v3.0/mm_grounding_dino/grounding_dino_swin-t_pretrain_obj365_goldg_grit9m_v3det/grounding_dino_swin-t_pretrain_obj365_goldg_grit9m_v3det_20231204_095047-b448804b.pth'  # noqa
 
-load_from = '../../checkpoints/grounding_dino_swin-t_pretrain_obj365_goldg_grit9m_v3det_20231204_095047-b448804b.pth'
+load_from = '../../../checkpoints/grounding_dino_swin-t_pretrain_obj365_goldg_grit9m_v3det_20231204_095047-b448804b.pth'
