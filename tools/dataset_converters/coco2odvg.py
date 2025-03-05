@@ -95,6 +95,10 @@ val_list_o365 = [i for i in range(1, 366)]
 key_list_v3det = [i for i in range(13204)]
 val_list_v3det = [i for i in range(1, 13205)]
 
+# doclaynet
+key_list_doclaynet = [i for i in range(11)]  # 假设 doclaynet 有11个类别
+val_list_doclaynet = [i for i in range(1, 12)]
+
 
 def dump_coco_label_map(args):
     ori_map = {
@@ -240,6 +244,20 @@ def dump_v3det_label_map(args):
     with open(output, 'w') as f:
         json.dump(o_dict, f)
 
+def dump_doclaynet_label_map(args):
+    with open(args.input, 'r') as f:
+        j = json.load(f)
+    o_dict = {}
+    for category in j['categories']:
+        index = str(int(category['id']) - 1)
+        name = category['name']
+        o_dict[index] = name
+    if args.output is None:
+        output = os.path.dirname(args.input) + '/doclaynet_label_map.json'
+    else:
+        output = os.path.dirname(args.output) + '/doclaynet_label_map.json'
+    with open(output, 'w') as f:
+        json.dump(o_dict, f)
 
 def coco2odvg(args):
     coco = COCO(args.input)
@@ -267,6 +285,10 @@ def coco2odvg(args):
         key_list = key_list_v3det
         val_list = val_list_v3det
         dump_v3det_label_map(args)
+    elif args.dataset == 'doclaynet':
+        key_list = key_list_doclaynet
+        val_list = val_list_doclaynet
+        dump_doclaynet_label_map(args)
 
     for img_id, img_info in tqdm(coco.imgs.items()):
         # missing images
@@ -338,8 +360,10 @@ if __name__ == '__main__':
         '-d',
         required=True,
         type=str,
-        choices=['coco', 'o365v1', 'o365v2', 'v3det'],
+        choices=['coco', 'o365v1', 'o365v2', 'v3det', 'doclaynet'],
     )
     args = parser.parse_args()
 
     coco2odvg(args)
+
+    # python tools/dataset_converters/coco2odvg.py /home/Datasets/DLA/DocLayNet/COCO/train.json -d doclaynet -o /home/Datasets/DLA/DocLayNet/COCO/train_mmdet.json
